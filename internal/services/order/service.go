@@ -3,7 +3,7 @@ package order
 import (
 	"context"
 	"errors"
-	pb "homework/pkg/api/proto"
+	pb "homework/internal/api/proto"
 	"sync"
 
 	"github.com/google/uuid"

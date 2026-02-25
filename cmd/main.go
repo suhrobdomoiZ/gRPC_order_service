@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	pb "homework/pkg/api/proto"
-	"homework/pkg/services/order"
+	pb "homework/internal/api/proto"
+	"homework/internal/services/order"
 	"log"
 	"net"
 
