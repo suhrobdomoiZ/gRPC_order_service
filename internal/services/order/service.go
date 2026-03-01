@@ -20,6 +20,7 @@ type OrderServiceServer struct {
 
 func NewOrderServiceServer() *OrderServiceServer {
 	return &OrderServiceServer{
+		mu:     &sync.Mutex{},
 		orders: make(map[string]*pb.Order),
 	}
 }
