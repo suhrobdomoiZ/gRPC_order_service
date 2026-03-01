@@ -10,7 +10,7 @@ PROTO_PKG=./internal/api/proto
 all: generate build
 
 generate:
-	@echo "Generating order.pb.go and order_grpc.go, using order.proto"
+	@echo "Generating order.pb.go and order_grpc.go, using order.proto..."
 	protoc --go_out=. --go_opt=paths=source_relative \
            --go-grpc_out=. --go-grpc_opt=paths=source_relative \
            $(PROTO_PATH)
