@@ -4,7 +4,7 @@ import (
 	"homework/pkg/config"
 )
 
-const GRPC_PORT config.ConfigKey = "GRPC_PORT"
+const GRPC_PORT load_config.ConfigKey = "GRPC_PORT"
 
 type Config struct {
 	grpcPort string
