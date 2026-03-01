@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"homework/config"
 	pb "homework/internal/api/proto"
+	"homework/internal/middleware"
 	"homework/internal/services/order"
 	"homework/pkg/load_config"
 	"log"
 	"net"
-	"os"
 
 	"google.golang.org/grpc"
 )
@@ -17,9 +16,7 @@ func main() {
 
 	err := load_config.LoadDotEnv("./config/.env")
 	if err != nil {
-		fmt.Errorf("main: failed to load .env file: %v", err)
-
-		os.Exit(1)
+		log.Fatalf("main: failed to load .env file: %v", err)
 	}
 
 	appConfig := config.NewConfig()
@@ -31,7 +28,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(middleware.LoggerInterceptor()))
 	pb.RegisterOrderServiceServer(grpcServer, orderServiceServer)
 
 	if err := grpcServer.Serve(lis); err != nil {

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"homework/pkg/config"
+	"homework/pkg/load_config"
 )
 
 const GRPC_PORT load_config.ConfigKey = "GRPC_PORT"
