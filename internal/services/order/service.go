@@ -3,7 +3,7 @@ package order
 import (
 	"context"
 	"errors"
-	pb "homework/pkg/api/proto"
+	pb "homework/internal/api/proto"
 	"sync"
 
 	"github.com/google/uuid"
@@ -20,6 +20,7 @@ type OrderServiceServer struct {
 
 func NewOrderServiceServer() *OrderServiceServer {
 	return &OrderServiceServer{
+		mu:     &sync.Mutex{},
 		orders: make(map[string]*pb.Order),
 	}
 }
