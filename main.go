@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	pb "homework/internal/api/proto"
 	"homework/internal/services/order"
 	"log"
@@ -19,7 +18,6 @@ func main() {
 	}
 	grpcServer := grpc.NewServer()
 	pb.RegisterOrderServiceServer(grpcServer, orderServiceServer)
-	fmt.Println("Server is running on :50051") //УРААААААААААААААААААААААААААААААААААААА
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
