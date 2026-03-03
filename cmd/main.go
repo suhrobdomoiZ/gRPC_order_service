@@ -22,7 +22,7 @@ func main() {
 	appConfig := config.NewConfig()
 
 	orderServiceServer := order.NewOrderServiceServer()
-	lis, err := net.Listen("tcp", appConfig.GRPCPort())
+	lis, err := net.Listen("tcp", ":"+appConfig.GRPCPort())
 
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
