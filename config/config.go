@@ -26,3 +26,7 @@ func NewConfig() *Config {
 func (c *Config) GRPCPort() string {
 	return c.grpcPort
 }
+
+func (c *Config) EnvType() string {
+	return c.envType
+}

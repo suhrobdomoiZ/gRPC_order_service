@@ -35,7 +35,3 @@ func Setup(env string) {
 func With(args ...any) *slog.Logger {
 	return slog.With(args...)
 }
-
-func NewLogger(level string) {
-
-}

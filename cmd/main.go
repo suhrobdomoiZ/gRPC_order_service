@@ -6,8 +6,10 @@ import (
 	"homework/internal/middleware"
 	"homework/internal/services/order"
 	"homework/pkg/load_config"
+	"homework/pkg/logger"
 	"log"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 )
@@ -20,15 +22,19 @@ func main() {
 	}
 
 	appConfig := config.NewConfig()
-	logger :=
+	logger.Setup(appConfig.EnvType())
+
+	lg := logger.With("service_name", "order-service")
+
 	orderServiceServer := order.NewOrderServiceServer()
 	lis, err := net.Listen("tcp", ":"+appConfig.GRPCPort())
 
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		lg.Error("main: failed to listen: %v", err)
+		os.Exit(1)
 	}
 
-	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(middleware.LoggerInterceptor()))
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(middleware.LoggerInterceptor(*lg)))
 	pb.RegisterOrderServiceServer(grpcServer, orderServiceServer)
 
 	if err := grpcServer.Serve(lis); err != nil {
