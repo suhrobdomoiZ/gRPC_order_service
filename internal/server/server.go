@@ -3,12 +3,17 @@ package server
 import (
 	"context"
 	"homework/config"
+	pb "homework/internal/api/proto"
+	"homework/internal/middleware"
 	"homework/internal/services/order"
 	"homework/pkg/closer"
 	"homework/pkg/load_config"
 	"homework/pkg/logger"
 	"log"
 	"log/slog"
+	"net"
+
+	"google.golang.org/grpc"
 )
 
 type Server struct {
@@ -20,7 +25,7 @@ type Server struct {
 	service order.OrderServiceServer
 }
 
-//"./config/.env"
+// "./config/.env"
 func NewServer(configPath string) *Server { //TODO: добавить closer
 
 	ctx := context.Background()
@@ -42,4 +47,24 @@ func NewServer(configPath string) *Server { //TODO: добавить closer
 		config:  *appConfig,
 		service: *orderServiceServer,
 	}
+}
+
+func (s *Server) Run() error { //TODO:вернуться после closer
+
+	errCh := make(chan error, 1)
+
+	lis, err := net.Listen("tcp", ":"+s.config.GRPCPort())
+
+	if err != nil {
+		s.logger.Error("server.Run: failed to listen: %v", err)
+		return err
+	}
+
+	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(middleware.LoggerInterceptor(*s.logger)))
+	pb.RegisterOrderServiceServer(grpcServer, &s.service)
+
+	if err := grpcServer.Serve(lis); err != nil {
+		return err
+	}
+	return nil
 }
