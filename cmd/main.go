@@ -20,7 +20,7 @@ func main() {
 	}
 
 	appConfig := config.NewConfig()
-
+	logger :=
 	orderServiceServer := order.NewOrderServiceServer()
 	lis, err := net.Listen("tcp", ":"+appConfig.GRPCPort())
 
