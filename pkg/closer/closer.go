@@ -22,7 +22,7 @@ type Closer struct {
 }
 
 func New(logger slog.Logger) *Closer {
-	return &Closer{
+	return Closer{
 		logger: logger, //остальное по дефолту добавится
 	}
 }
