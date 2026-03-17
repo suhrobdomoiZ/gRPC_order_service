@@ -81,7 +81,7 @@ func (s *Server) Run() error {
 	err = pb.RegisterOrderServiceHandlerFromEndpoint(
 		s.ctx,
 		mux,
-		"localhost:"+s.config.GRPCPort(), // адрес gRPC сервера (без http://)
+		"localhost:"+s.config.GRPCPort(),
 		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
 	)
 	if err != nil {

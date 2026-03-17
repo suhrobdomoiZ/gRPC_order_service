@@ -1,11 +1,9 @@
 syntax = "proto3";
 
-// 1. Исправленный пакет
 option go_package = "homework/internal/api/order";
 
 package api;
 
-// 2. Импорт аннотаций
 import "google/api/annotations.proto";
 
 service OrderService {
@@ -42,7 +40,7 @@ service OrderService {
   }
 }
 
-// Сообщения остаются без изменений
+
 message Order {
   string id = 1;
   string item = 2;
