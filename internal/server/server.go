@@ -58,8 +58,6 @@ func NewServer(configPath string) *Server {
 
 	lg := logger.With("service_name", "order-service")
 
-	orderServiceServer := order.NewOrderServiceServer()
-
 	pool, err := postgres.NewPool(ctx, dbConfig.DSN())
 	if err != nil {
 		lg.Error("server.NewServer: failed to connect to database: %v", err)
@@ -72,6 +70,7 @@ func NewServer(configPath string) *Server {
 		lg.Error("server.NewServer: failed to apply migrations: %v", err)
 		os.Exit(1)
 	}
+	orderServiceServer := order.NewOrderServiceServer(sqlDB)
 	serverCloser := closer.New(*lg)
 	serverCloser.AddFunc("postgres db", func() {
 		_ = sqlDB.Close()

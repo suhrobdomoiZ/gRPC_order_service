@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	pb "homework/internal/api/proto"
 	"sync"
@@ -16,12 +17,14 @@ type OrderServiceServer struct {
 	pb.UnimplementedOrderServiceServer                      //это структура с методами моего сервиса, но они все возвращают ошибку, типо мы не прописаны чел пропиши нас
 	mu                                 *sync.Mutex          //мютекс для синхронизации доступа к заказам
 	orders                             map[string]*pb.Order //сама мапа заказов
+	db                                 *sql.DB
 }
 
-func NewOrderServiceServer() *OrderServiceServer {
+func NewOrderServiceServer(db *sql.DB) *OrderServiceServer {
 	return &OrderServiceServer{
 		mu:     &sync.Mutex{},
 		orders: make(map[string]*pb.Order),
+		db:     db,
 	}
 }
 
@@ -55,7 +58,7 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrde
 
 }
 
-func (s *OrderServiceServer) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
+func (s *OrderServiceServer) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) { //TODO: добавить sql builder
 	if err := ctx.Err(); err != nil {
 		if errors.Is(err, context.Canceled) {
 			return nil, status.Error(codes.Canceled, "order.GetOrder: request canceled")
@@ -74,7 +77,7 @@ func (s *OrderServiceServer) GetOrder(ctx context.Context, req *pb.GetOrderReque
 
 }
 
-func (s *OrderServiceServer) UpdateOrder(ctx context.Context, req *pb.UpdateOrderRequest) (*pb.UpdateOrderResponse, error) {
+func (s *OrderServiceServer) UpdateOrder(ctx context.Context, req *pb.UpdateOrderRequest) (*pb.UpdateOrderResponse, error) { //TODO: добавить sql builder
 	if err := ctx.Err(); err != nil {
 		if errors.Is(err, context.Canceled) {
 			return nil, status.Error(codes.Canceled, "order.UpdateOrder: request canceled")
@@ -97,7 +100,7 @@ func (s *OrderServiceServer) UpdateOrder(ctx context.Context, req *pb.UpdateOrde
 	return &pb.UpdateOrderResponse{Order: order}, nil
 }
 
-func (s *OrderServiceServer) DeleteOrder(ctx context.Context, req *pb.DeleteOrderRequest) (*pb.DeleteOrderResponse, error) {
+func (s *OrderServiceServer) DeleteOrder(ctx context.Context, req *pb.DeleteOrderRequest) (*pb.DeleteOrderResponse, error) { //TODO: добавить sql builder
 	if err := ctx.Err(); err != nil {
 		if errors.Is(err, context.Canceled) {
 			return nil, status.Error(codes.Canceled, "order.DeleteOrder: request canceled")
@@ -118,7 +121,7 @@ func (s *OrderServiceServer) DeleteOrder(ctx context.Context, req *pb.DeleteOrde
 
 }
 
-func (s *OrderServiceServer) ListOrders(ctx context.Context, req *pb.ListOrdersRequest) (*pb.ListOrdersResponse, error) {
+func (s *OrderServiceServer) ListOrders(ctx context.Context, req *pb.ListOrdersRequest) (*pb.ListOrdersResponse, error) { //TODO: добавить sql builder
 	if err := ctx.Err(); err != nil {
 		if errors.Is(err, context.Canceled) {
 			return nil, status.Error(codes.Canceled, "order.ListOrders: request canceled")
