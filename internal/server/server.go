@@ -2,15 +2,19 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"homework/config"
 	pb "homework/internal/api/proto"
 	"homework/internal/middleware"
+	"homework/internal/migrations"
 	"homework/internal/services/order"
 	"homework/pkg/closer"
 	"homework/pkg/load_config"
 	"homework/pkg/logger"
+	"homework/pkg/migrator"
+	"homework/pkg/postgres"
 	"log"
 	"log/slog"
 	"net"
@@ -21,6 +25,8 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -33,6 +39,9 @@ type Server struct {
 
 	service    order.OrderServiceServer
 	httpServer *http.Server
+
+	pool *pgxpool.Pool
+	db   *sql.DB
 }
 
 func NewServer(configPath string) *Server {
@@ -44,13 +53,29 @@ func NewServer(configPath string) *Server {
 	}
 
 	appConfig := config.NewConfig()
+	dbConfig := appConfig.DB()
 	logger.Setup(appConfig.EnvType())
 
 	lg := logger.With("service_name", "order-service")
 
-	orderServiceServer := order.NewOrderServiceServer()
+	pool, err := postgres.NewPool(ctx, dbConfig.DSN())
+	if err != nil {
+		lg.Error("server.NewServer: failed to connect to database: %v", err)
+		os.Exit(1)
+	}
 
+	sqlDB := stdlib.OpenDBFromPool(pool)
+	m, err := migrator.EmbedMigrations(sqlDB, migrations.FS, ".")
+	if err := m.Up(); err != nil {
+		lg.Error("server.NewServer: failed to apply migrations: %v", err)
+		os.Exit(1)
+	}
+	orderServiceServer := order.NewOrderServiceServer(sqlDB)
 	serverCloser := closer.New(*lg)
+	serverCloser.AddFunc("postgres db", func() {
+		_ = sqlDB.Close()
+	})
+	serverCloser.AddFunc("postgres pool", pool.Close)
 
 	return &Server{
 		Logger:  lg,
@@ -58,6 +83,8 @@ func NewServer(configPath string) *Server {
 		config:  *appConfig,
 		service: *orderServiceServer,
 		closer:  serverCloser,
+		pool:    pool,
+		db:      sqlDB,
 	}
 }
 
@@ -81,7 +108,7 @@ func (s *Server) Run() error {
 	err = pb.RegisterOrderServiceHandlerFromEndpoint(
 		s.ctx,
 		mux,
-		"localhost:"+s.config.GRPCPort(), // адрес gRPC сервера (без http://)
+		"localhost:"+s.config.GRPCPort(),
 		[]grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())},
 	)
 	if err != nil {
