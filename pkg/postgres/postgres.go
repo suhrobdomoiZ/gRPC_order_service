@@ -27,7 +27,7 @@ type Options struct {
 	ConnectTimeout  time.Duration
 }
 
-func defaultOptions() *Options {
+func DefaultOptions() *Options {
 	return &Options{
 		MaxConns:        defaultMaxConns,
 		MaxConnLifeTime: defaultMaxConnLifeTime,
@@ -57,7 +57,7 @@ func NewPool(ctx context.Context, dsn string, opts ...Options) (*pgxpool.Pool, e
 		return nil, fmt.Errorf("postgres.NewPool: %w", err)
 	}
 
-	opt := defaultOptions()
+	opt := DefaultOptions()
 	if len(opts) > 0 {
 		applyOptions(cfg, &opts[0])
 	} else {

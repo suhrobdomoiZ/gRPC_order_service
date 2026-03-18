@@ -13,6 +13,8 @@ const (
 	DB_PASSWORD load_config.ConfigKey = "DB_PASSWORD"
 	DB_HOST     load_config.ConfigKey = "DB_HOST"
 	DB_PORT     load_config.ConfigKey = "DB_PORT"
+
+	DB_URL load_config.ConfigKey = "DB_URL"
 )
 
 type configDB struct {
@@ -20,6 +22,7 @@ type configDB struct {
 	password string
 	host     string
 	port     string
+	dsn      string
 }
 
 func NewConfigDB() *configDB {
@@ -28,6 +31,7 @@ func NewConfigDB() *configDB {
 		password: DB_PASSWORD.MustGet(),
 		host:     DB_HOST.MustGet(),
 		port:     DB_PORT.MustGet(),
+		dsn:      DB_URL.MustGet(),
 	}
 }
 
@@ -42,6 +46,9 @@ func (db configDB) Host() string {
 }
 func (db configDB) Port() string {
 	return db.port
+}
+func (db configDB) DSN() string {
+	return db.dsn
 }
 
 type Config struct {
@@ -74,4 +81,8 @@ func (c *Config) EnvType() string {
 
 func (c *Config) HTTPPort() string {
 	return c.httpPort
+}
+
+func (c *Config) DB() *configDB {
+	return c.db
 }
