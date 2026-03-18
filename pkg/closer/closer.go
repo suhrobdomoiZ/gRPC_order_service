@@ -22,7 +22,7 @@ type Closer struct {
 }
 
 func New(logger slog.Logger) *Closer {
-	return Closer{
+	return &Closer{
 		logger: logger, //остальное по дефолту добавится
 	}
 }
@@ -50,7 +50,7 @@ func (c *Closer) Close(ctx context.Context) error {
 	for _, item := range items {
 		if err := item.fn(ctx); err != nil {
 			result = multierr.Append(result, err)
-			c.logger.Error("closer.Close: shutdown hoook failed", "name", item.name, "err", err)
+			c.logger.Error("closer.Close: shutdown hook failed", "name", item.name, "err", err)
 		}
 	}
 	c.logger.Info("closer.Close: shutdown hook finished", "result", result)

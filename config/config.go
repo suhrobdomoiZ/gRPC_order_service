@@ -8,22 +8,46 @@ const (
 	GRPC_PORT load_config.ConfigKey = "GRPC_PORT"
 	ENV_TYPE  load_config.ConfigKey = "ENV_TYPE"
 	HTTP_PORT load_config.ConfigKey = "HTTP_PORT"
+
+	DB_USERNAME load_config.ConfigKey = "DB_USERNAME"
+	DB_PASSWORD load_config.ConfigKey = "DB_PASSWORD"
+	DB_HOST     load_config.ConfigKey = "DB_HOST"
+	DB_PORT     load_config.ConfigKey = "DB_PORT"
 )
+
+type configDB struct {
+	username string
+	password string
+	host     string
+	port     string
+}
+
+func NewConfigDB() *configDB {
+	return &configDB{
+		username: DB_USERNAME.MustGet(),
+		password: DB_PASSWORD.MustGet(),
+		host:     DB_HOST.MustGet(),
+		port:     DB_PORT.MustGet(),
+	}
+}
 
 type Config struct {
 	grpcPort string
 	envType  string
 	httpPort string
+	db       *configDB
 }
 
 func NewConfig() *Config {
 	grpcPort := GRPC_PORT.MustGet()
 	envType := ENV_TYPE.MustGet()
 	httpPort := HTTP_PORT.MustGet()
+
 	return &Config{
 		grpcPort: grpcPort,
 		envType:  envType,
 		httpPort: httpPort,
+		db:       NewConfigDB(),
 	}
 }
 
