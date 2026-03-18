@@ -31,6 +31,19 @@ func NewConfigDB() *configDB {
 	}
 }
 
+func (db configDB) Username() string {
+	return db.username
+}
+func (db configDB) Password() string {
+	return db.password
+}
+func (db configDB) Host() string {
+	return db.host
+}
+func (db configDB) Port() string {
+	return db.port
+}
+
 type Config struct {
 	grpcPort string
 	envType  string
